@@ -1,0 +1,22 @@
+system.devel          tmm
+virtualbox            tmm
+git                   tmm
+phpmyadmin            tmm
+kdesdk                tmm
+skype                 henüz depoda yok. 
+
+benimkiler:
+R, R-docs, R-devel    tmm
+rkward                tmm
+hugin                 tmm
+lyx                   tmm
+asymptote             tmm
+autopano-sift-C       tmm
+
+
+
+yeniler:
+mongodb
+kraft
+ctemplate
+pisa

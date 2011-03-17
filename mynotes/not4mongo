@@ -1,0 +1,8 @@
+killproc ile mongod.lock u öldürüyorlar  uygulandı
+killproc u bağımlılığa yazmalı mı ? 
+pidfile i silmek lazım                   silindi
+doxygen lazım mı? 
+mongo kullanıcı grubu lazım mı? 
+
+service mongodb on dediğimizde ssistem başladığında başlamıyor? 
+
