@@ -35,11 +35,10 @@ alias cp="cp -i"
 alias grep="grep --color"
 alias egrep="egrep --color"
 alias fgrep="fgrep --color"
-alias stable2009="cd ~/mySvn/2009/stable"
-alias devel2009="cd ~/mySvn/2009/devel"
+alias devel2011="cd ~/mySvn/2011/devel"
 alias contribdevel="cd ~/mySvn/contrib/devel"
-alias contribstable="cd ~/mySvn/contrib/stable"
 alias myplayground="cd ~/mySvn/ertugrul"
+alias devel2011="cd ~/mySvn/2011/devel && svn up"
 
 alias scp-resume="rsync --compress-level=3 --partial --progress --rsh=ssh"
 
