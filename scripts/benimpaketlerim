@@ -1,0 +1,5 @@
+## kendi paketlerimi bul
+## çıktıyı düzeltebilmeliyim.
+
+DIR=/var/lib/pisi/package
+find $DIR metadata.xml |xargs grep "<PartOf>unknown</PartOf>"
