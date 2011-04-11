@@ -1,0 +1,22 @@
+/home/ertugrul/checkelf mongodb-1.6.5-2-p11-x86_64.pisi 
+
+Package: mongodb
+----------------
+
+Unused direct dependency analysis                                                                                                                                           
+---------------------------------
+/tmp/checklib-fsxQB_/usr/bin/mongo
+   /usr/lib/libncursesw.so.5
+   /lib/librt.so.1
+/tmp/checklib-fsxQB_/usr/bin/mongosniff
+   /usr/lib/libboost_program_options-mt.so.1.44.0
+   /usr/lib/libjs.so.1
+
+Written dependencies           Detected dependencies          Missing dependencies                                                                                          
+----------------------------------------------------------------------------------
+nspr                           boost                                                        
+boost                          libpcap                                                      
+libpcap                        spidermonkey                                                 
+spidermonkey  
+
+mongodb checkelf çıktısı 
