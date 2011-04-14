@@ -41,8 +41,9 @@ alias myplayground="cd ~/mySvn/ertugrul"
 alias devel2011="cd ~/mySvn/2011/devel && svn up"
 
 alias scp-resume="rsync --compress-level=3 --partial --progress --rsh=ssh"
-SVN_EDITOR="vi"
-GIT_EDITOR="vi"
+
+export SVN_EDITOR="vi"
+export GIT_EDITOR="vi"
 
 # Change the window title of X terminals
 case $TERM in
