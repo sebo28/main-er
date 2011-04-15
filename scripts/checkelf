@@ -8,7 +8,10 @@
 # Software Foundation; either version 2 of the License, or (at your option)
 # any later version.
 
-# For more information execute "checklib --help"
+# For more information execute run with '--help'
+#
+# A detailed documentation about checkelf can be found on:
+# http://developer.pardus.org.tr/guides/packaging/checkelf.html
 
 import os
 import re
@@ -111,16 +114,19 @@ def check_pc_files(pc_file):
 
     return result_needed
 
-def check_intersections(result_dependencies, package_deps, package_name, systembase):
-    '''eliminate system base packages and self written deps'''
+def check_intersections(result_dependencies, package_deps, package_name, systembase, systemdevel):
+    '''eliminate system base and system devel packages and self written deps'''
 
-    # get system.base packages
+    # get system.base and system.devel packages
     systembase_packages = []
+    systemdevel_packages= []
     cdb = pisi.db.componentdb.ComponentDB()
     for repo in pisi.db.repodb.RepoDB().list_repos():
         for component in cdb.list_components(repo):
             if component == "system.base":
                 systembase_packages.extend(cdb.get_packages('system.base', repo))
+            if component == "system.devel":
+                systemdevel_packages.extend(cdb.get_packages('system.devel', repo))
 
     # look for packages that are system.base but are written as dependency
     # mark them with "*"
@@ -128,6 +134,13 @@ def check_intersections(result_dependencies, package_deps, package_name, systemb
     for deps in package_deps:
         if deps in result_must_removed:
             package_deps[package_deps.index(deps)] = "%s (base)" % deps
+
+    # look for packages that are system.devel but are written as dependency
+    # mark them with "*"
+    result_must_removed = list(set(package_deps) & set(systemdevel_packages))
+    for deps in package_deps:
+        if deps in result_must_removed:
+            package_deps[package_deps.index(deps)] = "%s (devel)" % deps
 
     # extract the dependency package names and store them in result_deps
     # dependencies tagged as broken or given itself are eliminated
@@ -144,11 +157,17 @@ def check_intersections(result_dependencies, package_deps, package_name, systemb
     # mark packages that are common to system.base and result_deps with *
     if not systembase:
         result_deps = list(set(result_deps) - set(systembase_packages))
-    else:
+    if not systemdevel and package_name.endswith('-devel'):
+        result_deps = list(set(result_deps) - set(systemdevel_packages))
+    if systemdevel or systembase:
         result_must_removed = list(set(result_deps) & set(systembase_packages))
         for deps in result_deps:
             if deps in result_must_removed:
                 result_deps[result_deps.index(deps)] = "%s (base)" % deps
+        result_must_removed = list(set(result_deps) & set(systemdevel_packages))
+        for deps in result_deps:
+            if deps in result_must_removed:
+                result_deps[result_deps.index(deps)] = "%s (devel)" % deps
         result_deps = list(set(result_deps))
 
     # remove packages that already are written in metadata.xml (runtime dependencies written in pspec.xml)
@@ -280,7 +299,7 @@ def main(arg):
         if option.recursive:
             for root, dirs, files in os.walk(option.directory):
                 for data in files:
-                    if data.endswith("pisi"):
+                    if data.endswith(".pisi"):
                         packages.append(os.path.join(root, data))
         else:
             # No recursion is used, just get the pisi
@@ -299,14 +318,10 @@ def main(arg):
     if option.installedlist:
         packages.extend(INSTALLDB.list_installed())
 
-
-    # Checklib support several mixed arguments. You can look for a installed package, for a single pisi file. etc.
-    # For example : checklib gcc rekonq-0.6.0-9.pisi -d tempdir/
-    # It looks for the installed package gcc, for the specified pisi file and for pisi file in the directory tempdir
-    used_pisi = False
+    used_pisi = False # Do not check for a pisi binary file and for a package installed on the system
     for package in packages:
         # Check loop for .pisi files
-        if package.endswith("pisi"):
+        if package.endswith(".pisi"):
             used_pisi = True
             package_pisi = pisi.package.Package(package)
             package_meta = package_pisi.get_metadata()
@@ -316,7 +331,7 @@ def main(arg):
             package_deps = [dep.name() for dep in package_meta.package.runtimeDependencies()]
 
             # Contains extracted package content
-            package_tempdir = tempfile.mkdtemp(prefix='checklib-')
+            package_tempdir = tempfile.mkdtemp(prefix=os.path.basename(sys.argv[0]) + '-')
             package_pisi.extract_install(package_tempdir)
 
             # Get results from objdump,ldd,etc...
@@ -326,7 +341,7 @@ def main(arg):
             # Look for intersections of the packages(i.e. do not include system.base packages)
             # result_lists is a iteration object which contains tuples of length 3
             # this tuple makes it easy to print the missing dependencies. look for print_results()
-            result_lists = check_intersections(result_dependencies, package_deps, package_name, option.systembase)
+            result_lists = check_intersections(result_dependencies, package_deps, package_name, option.systembase, option.systemdevel)
 
             # Print the results in a fancy output
             print_results(result_broken, result_unused, result_undefined, result_lists, result_runpath, package_name, option)
@@ -335,7 +350,7 @@ def main(arg):
             if package_tempdir.startswith("/tmp/"):
                 shutil.rmtree(package_tempdir)
 
-        # Check for the installed package
+        # Check for a installed package in the system
         elif package in INSTALLDB.list_installed():
             if used_pisi:
                 print "You've checked for a pisi file before\nPlease do not check for a installed package and pisi file at the same time"
@@ -351,7 +366,7 @@ def main(arg):
                 result_dependencies, result_broken, result_unused, result_undefined, result_runpath = \
                 output_result(package_name, package_tempdir)
 
-                result_lists = check_intersections(result_dependencies, package_deps, package_name, option.systembase)
+                result_lists = check_intersections(result_dependencies, package_deps, package_name, option.systembase, option.systemdevel)
                 print_results(result_broken, result_unused, result_undefined, result_lists, result_runpath, package_name, option)
 
         else:
@@ -410,6 +425,8 @@ def print_results(result_broken, result_unused, result_undefined, result_lists, 
             for deps in tuple_deps:
                 if "(base)" in deps:
                     print "%s" % colorize(deps.ljust(30), 'red', option.nocolor),
+                elif "(devel)" in deps:
+                    print "%s" % colorize(deps.ljust(30), 'yellow', option.nocolor),
                 else:
                     print deps.ljust(30),
             print
@@ -455,8 +472,8 @@ def argument():
     # TODO: use argparse() in the future
 
     parser = optparse.OptionParser(usage="Usage:  %prog [options] foo.pisi foo2.pisi \n \t%prog [options] -d  <path>\n \t%prog [options]\n \t%prog [options] foo",
-                                  version="%prog 0.1",
-                                  prog="checklib")
+                                  version="%prog 0.1")
+
     # Group options
     # check_options = optparse.OptionGroup(parser, "Check Options")
 
@@ -507,6 +524,12 @@ def argument():
                      dest="systembase",
                      default=False,
                      help="Don't hide system.base dependencies")
+
+    parser.add_option("-x", "--systemdevel",
+                     action="store_true",
+                     dest="systemdevel",
+                     default=False,
+                     help="Show(colorize) system.devel dependencies")
 
     parser.add_option("-c", "--component",
                      action="store",
