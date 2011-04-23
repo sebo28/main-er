@@ -35,7 +35,7 @@ alias cp="cp -i"
 alias grep="grep --color"
 alias egrep="egrep --color"
 alias fgrep="fgrep --color"
-alias devel2011="cd ~/mySvn/2011/devel"
+
 alias contribdevel="cd ~/mySvn/contrib/devel"
 alias myplayground="cd ~/mySvn/ertugrul"
 alias devel2011="cd ~/mySvn/2011/devel && svn up"
