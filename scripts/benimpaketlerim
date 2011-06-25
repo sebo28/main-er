@@ -1,5 +1,3 @@
-## kendi paketlerimi bul
-## çıktıyı düzeltebilmeliyim.
+## yerelde derlenen paketleri göster
 
-DIR=/var/lib/pisi/package
-find $DIR metadata.xml |xargs grep "<PartOf>unknown</PartOf>"
+pisi li -b "localhost"
