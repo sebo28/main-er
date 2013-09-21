@@ -33,16 +33,15 @@ alias rm="rm -i"
 alias mv="mv -i"
 alias cp="cp -i"
 alias grep="grep --color"
+alias pgrep="pgrep -f"
+alias pkill="pkill -f"
 alias egrep="egrep --color"
 alias fgrep="fgrep --color"
-
-alias contribdevel="cd ~/mySvn/contrib/devel"
-alias myplayground="cd ~/mySvn/ertugrul"
-alias devel2011="cd ~/mySvn/2011/devel && svn up"
+alias devel="cd ~/works/Pisilinux"
+alias blog="cd ~/works/octopress"
 
 alias scp-resume="rsync --compress-level=3 --partial --progress --rsh=ssh"
 
-export SVN_EDITOR="vi"
 export GIT_EDITOR="vi"
 
 # Change the window title of X terminals
