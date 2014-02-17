@@ -37,8 +37,11 @@ alias pgrep="pgrep -f"
 alias pkill="pkill -f"
 alias egrep="egrep --color"
 alias fgrep="fgrep --color"
+
 alias devel="cd ~/works/Pisilinux"
 alias blog="cd ~/works/octopress"
+alias dmesg="dmesg --human"
+alias myplayground="cd ~/works/playground/ertugrul"
 
 alias scp-resume="rsync --compress-level=3 --partial --progress --rsh=ssh"
 
@@ -61,4 +64,4 @@ for sh in /etc/profile.d/*.sh ; do
 done
 unset sh
 
-
+# export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
